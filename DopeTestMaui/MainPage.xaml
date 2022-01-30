@@ -31,7 +31,7 @@
                VerticalOptions="Start" HorizontalOptions="Center" Text="Warming up.." IsVisible="False"/>
 
         <StackLayout x:Name="buttons" Orientation="Horizontal" Grid.Row="1" Grid.Column="0" VerticalOptions="End"
-                         HorizontalOptions="Center" Margin="5,0,0,25" >
+                         HorizontalOptions="Center" Margin="5,0,0,25" WidthRequest="600" >
 
             <Button x:Name="stop"
                 Text="@ Stop" BackgroundColor="Red" HorizontalOptions="Center"
