@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using Android.Views;
 
 namespace DopeTestMaui;
 
@@ -11,6 +12,7 @@ public class MainActivity : MauiAppCompatActivity
 	{
 		base.OnCreate(savedInstanceState);
 		Platform.Init(this, savedInstanceState);
+		Window.AddFlags(WindowManagerFlags.KeepScreenOn);
 	}
 
 	public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)

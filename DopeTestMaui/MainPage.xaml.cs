@@ -1,12 +1,18 @@
-﻿using Microsoft.Maui.Layouts;
+﻿using Azure.Storage.Blobs;
+using Microsoft.Maui.Layouts;
+using Newtonsoft.Json;
 using Saplin.xOPS.UI.Misc;
 using System.Diagnostics;
+using System.Text;
 
 namespace DopeTestMaui;
 
 public partial class MainPage : ContentPage
 {
-	public MainPage()
+
+    private static readonly CancellationTokenSource _cts = new CancellationTokenSource(1500);
+
+    public MainPage()
 	{
 		InitializeComponent();
 	}
@@ -491,6 +497,145 @@ public partial class MainPage : ContentPage
         breakTest = true;
         stop.IsVisible = false;
         startChangeST.IsVisible = startST.IsVisible = startGridST.IsVisible = true;
+    }
+
+    private async void startAll_Clicked(object sender, EventArgs e)
+    {
+
+        var startSTCts = new CancellationTokenSource(12000);
+        SetControlsAtStart();
+        startST.IsVisible = true;
+        startST.IsEnabled = false;
+        StartTestST();
+        await Task.Run(() =>
+        {
+            while (true)
+            {
+                if (startSTCts.Token.IsCancellationRequested)
+                {
+                    breakTest = true;
+                    break;
+                }
+            }
+        });
+        // TODO: save result
+        var resultST = dopes.Text;
+        startST.IsEnabled = true;
+        startST.IsVisible = false;
+
+        var startChangeSTCts = new CancellationTokenSource(12000);
+        SetControlsAtStart();
+        startChangeST.IsVisible = true;
+        startChangeST.IsEnabled = false;
+        StartTestChangeST();
+        await Task.Run(() =>
+        {
+            while (true)
+            {
+                if (startChangeSTCts.Token.IsCancellationRequested)
+                {
+                    breakTest = true;
+                    break;
+                }
+            }
+        });
+        // TODO: save result
+        var resultChangeST = dopes.Text;
+        startChangeST.IsEnabled = true;
+        startChangeST.IsVisible = false;
+
+        var startGridSTCts = new CancellationTokenSource(12000);
+        SetControlsAtStart();
+        startGridST.IsVisible = true;
+        startGridST.IsEnabled = false;
+        StartTestGridST();
+        await Task.Run(() =>
+        {
+            while (true)
+            {
+                if (startGridSTCts.Token.IsCancellationRequested)
+                {
+                    breakTest = true;
+                    break;
+                }
+            }
+        });
+        // TODO: save result
+        var resultGridST = dopes.Text;
+        startGridST.IsEnabled = true;
+        startGridST.IsVisible = false;
+
+    }
+
+    async void startAll_Clicked(System.Object sender, object e)
+    {
+        int testLengthMs = 3000;
+
+        var startSTCts = new CancellationTokenSource(testLengthMs);
+        SetControlsAtStart();
+        startST.IsVisible = true;
+        startST.IsEnabled = false;
+        Device.BeginInvokeOnMainThread(() => StartTestST());
+        await StopTest(startSTCts);
+        var resultST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        startST.IsEnabled = true;
+        startST.IsVisible = false;
+
+
+        var startChangeSTCts = new CancellationTokenSource(testLengthMs);
+        SetControlsAtStart();
+        startChangeST.IsVisible = true;
+        startChangeST.IsEnabled = false;
+        Device.BeginInvokeOnMainThread(() => StartTestChangeST());
+        await StopTest(startChangeSTCts);
+        var resultChangeST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        startChangeST.IsEnabled = true;
+        startChangeST.IsVisible = false;
+
+
+        var startGridSTCts = new CancellationTokenSource(testLengthMs);
+        SetControlsAtStart();
+        startGridST.IsVisible = true;
+        startGridST.IsEnabled = false;
+        Device.BeginInvokeOnMainThread(() => StartTestGridST());
+        await StopTest(startGridSTCts);
+        var resultGridST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        startGridST.IsEnabled = true;
+        startGridST.IsVisible = false;
+
+        var platformVersion = typeof(MauiApp).Assembly.GetName().Version.ToString();
+        var results = new { OS = Environment.OSVersion.VersionString, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = resultGridST };
+        string jsonString = JsonConvert.SerializeObject(results);
+
+        Console.WriteLine(jsonString);
+
+        var client = new BlobServiceClient(Config.StorageConnectionString);
+        var blobContainerClient = client.GetBlobContainerClient("results");
+        await blobContainerClient.CreateIfNotExistsAsync();
+
+        var filename = $"{Environment.OSVersion}-{DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss")}.json";
+
+        var blobClient = blobContainerClient.GetBlobClient(filename);
+
+        using (MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString)))
+            await blobContainerClient.UploadBlobAsync(filename, memoryStream);
+
+
+        async Task StopTest(CancellationTokenSource cts)
+        {
+            await Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (cts.Token.IsCancellationRequested)
+                    {
+                        breakTest = true;
+                        await Task.Delay(100);
+                        break;
+                    }
+                }
+            });
+        }
     }
 }
 

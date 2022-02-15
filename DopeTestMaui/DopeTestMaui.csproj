@@ -62,6 +62,12 @@
 	  <EmbeddedResource Include="IBMPlexMono-Regular.ttf" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Azure.Core" Version="1.22.0" />
+	  <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<OutputType>WinExe</OutputType>
 		<RuntimeIdentifier>win10-x64</RuntimeIdentifier>

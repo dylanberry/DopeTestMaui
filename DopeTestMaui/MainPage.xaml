@@ -31,22 +31,25 @@
                VerticalOptions="Start" HorizontalOptions="Center" Text="Warming up.." IsVisible="False"/>
 
         <StackLayout x:Name="buttons" Orientation="Horizontal" Grid.Row="1" Grid.Column="0" VerticalOptions="End"
-                         HorizontalOptions="Center" Margin="5,0,0,25" WidthRequest="600" >
+                         HorizontalOptions="Center" Margin="5,0,0,25">
 
             <Button x:Name="stop"
-                Text="@ Stop" BackgroundColor="Red" HorizontalOptions="Center"
+                Text="Stop" BackgroundColor="Red" HorizontalOptions="Center"
                 IsVisible="False" Clicked="Stop_Clicked"/>
             <!--<Button x:Name="startMT"
                 Text="@ MT" BackgroundColor="Blue"
                 Clicked="startMT_Clicked"/>-->
+            <Button x:Name="startAll"
+                Text="All" BackgroundColor="Green"
+                Clicked="startAll_Clicked"/>
             <Button x:Name="startST"
-                Text="@ Build" BackgroundColor="Blue"
+                Text="Build" BackgroundColor="Blue"
                 Clicked="startST_Clicked"/>
              <Button x:Name="startGridST"
-                Text="@ Grid" BackgroundColor="Blue"
+                Text="Grid" BackgroundColor="Blue"
                 Clicked="startGridST_Clicked"/>
              <Button x:Name="startChangeST"
-                Text="@ Change" BackgroundColor="Blue"
+                Text="Change" BackgroundColor="Blue"
                 Clicked="startChangeST_Clicked"/>
 
         </StackLayout>
