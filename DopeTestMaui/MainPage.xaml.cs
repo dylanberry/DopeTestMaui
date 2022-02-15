@@ -501,75 +501,7 @@ public partial class MainPage : ContentPage
 
     private async void startAll_Clicked(object sender, EventArgs e)
     {
-
-        var startSTCts = new CancellationTokenSource(12000);
-        SetControlsAtStart();
-        startST.IsVisible = true;
-        startST.IsEnabled = false;
-        StartTestST();
-        await Task.Run(() =>
-        {
-            while (true)
-            {
-                if (startSTCts.Token.IsCancellationRequested)
-                {
-                    breakTest = true;
-                    break;
-                }
-            }
-        });
-        // TODO: save result
-        var resultST = dopes.Text;
-        startST.IsEnabled = true;
-        startST.IsVisible = false;
-
-        var startChangeSTCts = new CancellationTokenSource(12000);
-        SetControlsAtStart();
-        startChangeST.IsVisible = true;
-        startChangeST.IsEnabled = false;
-        StartTestChangeST();
-        await Task.Run(() =>
-        {
-            while (true)
-            {
-                if (startChangeSTCts.Token.IsCancellationRequested)
-                {
-                    breakTest = true;
-                    break;
-                }
-            }
-        });
-        // TODO: save result
-        var resultChangeST = dopes.Text;
-        startChangeST.IsEnabled = true;
-        startChangeST.IsVisible = false;
-
-        var startGridSTCts = new CancellationTokenSource(12000);
-        SetControlsAtStart();
-        startGridST.IsVisible = true;
-        startGridST.IsEnabled = false;
-        StartTestGridST();
-        await Task.Run(() =>
-        {
-            while (true)
-            {
-                if (startGridSTCts.Token.IsCancellationRequested)
-                {
-                    breakTest = true;
-                    break;
-                }
-            }
-        });
-        // TODO: save result
-        var resultGridST = dopes.Text;
-        startGridST.IsEnabled = true;
-        startGridST.IsVisible = false;
-
-    }
-
-    async void startAll_Clicked(System.Object sender, object e)
-    {
-        int testLengthMs = 3000;
+        int testLengthMs = 60000;
 
         var startSTCts = new CancellationTokenSource(testLengthMs);
         SetControlsAtStart();
@@ -577,7 +509,7 @@ public partial class MainPage : ContentPage
         startST.IsEnabled = false;
         Device.BeginInvokeOnMainThread(() => StartTestST());
         await StopTest(startSTCts);
-        var resultST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultST);
         startST.IsEnabled = true;
         startST.IsVisible = false;
 
@@ -588,7 +520,7 @@ public partial class MainPage : ContentPage
         startChangeST.IsEnabled = false;
         Device.BeginInvokeOnMainThread(() => StartTestChangeST());
         await StopTest(startChangeSTCts);
-        var resultChangeST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultChangeST);
         startChangeST.IsEnabled = true;
         startChangeST.IsVisible = false;
 
@@ -599,7 +531,7 @@ public partial class MainPage : ContentPage
         startGridST.IsEnabled = false;
         Device.BeginInvokeOnMainThread(() => StartTestGridST());
         await StopTest(startGridSTCts);
-        var resultGridST = Convert.ToDecimal(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim());
+        _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultGridST);
         startGridST.IsEnabled = true;
         startGridST.IsVisible = false;
 
