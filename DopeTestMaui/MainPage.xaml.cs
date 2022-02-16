@@ -502,71 +502,61 @@ public partial class MainPage : ContentPage
     private async void startAll_Clicked(object sender, EventArgs e)
     {
         int testLengthMs = 60000;
+        int pauseLengthMs = 100;
 
-        var startSTCts = new CancellationTokenSource(testLengthMs);
-        SetControlsAtStart();
-        startST.IsVisible = true;
-        startST.IsEnabled = false;
-        Device.BeginInvokeOnMainThread(() => StartTestST());
-        await StopTest(startSTCts);
+        startST_Clicked(default, default);
+        await Task.Delay(testLengthMs);
+        Stop_Clicked(default, default);
+        await Task.Delay(pauseLengthMs);
         _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultST);
-        startST.IsEnabled = true;
-        startST.IsVisible = false;
 
-
-        var startChangeSTCts = new CancellationTokenSource(testLengthMs);
-        SetControlsAtStart();
-        startChangeST.IsVisible = true;
-        startChangeST.IsEnabled = false;
-        Device.BeginInvokeOnMainThread(() => StartTestChangeST());
-        await StopTest(startChangeSTCts);
+        startChangeST_Clicked(default, default);
+        await Task.Delay(testLengthMs);
+        Stop_Clicked(default, default);
+        await Task.Delay(pauseLengthMs);
         _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultChangeST);
-        startChangeST.IsEnabled = true;
-        startChangeST.IsVisible = false;
 
-
-        var startGridSTCts = new CancellationTokenSource(testLengthMs);
-        SetControlsAtStart();
-        startGridST.IsVisible = true;
-        startGridST.IsEnabled = false;
-        Device.BeginInvokeOnMainThread(() => StartTestGridST());
-        await StopTest(startGridSTCts);
+        startGridST_Clicked(default, default);
+        await Task.Delay(testLengthMs);
+        Stop_Clicked(default, default);
+        await Task.Delay(pauseLengthMs);
         _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultGridST);
-        startGridST.IsEnabled = true;
-        startGridST.IsVisible = false;
 
-        var platformVersion = typeof(MauiApp).Assembly.GetName().Version.ToString();
-        var results = new { OS = Environment.OSVersion.VersionString, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = resultGridST };
+        var platformVersion = "Maui 6.0.200-preview.12.2441";
+
+#if ANDROID
+            var operatingSystem = "Android";
+#elif IOS
+            var operatingSystem = "iOS";
+#elif MACCATALYST
+            var operatingSystem = "MacCatalyst";
+#elif WINDOWS
+        var operatingSystem = "WinUI";
+#else
+        var operatingSystem = "Unknown";
+#endif
+
+        var results = new { OS = operatingSystem, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = resultGridST };
         string jsonString = JsonConvert.SerializeObject(results);
 
         Console.WriteLine(jsonString);
 
-        var client = new BlobServiceClient(Config.StorageConnectionString);
-        var blobContainerClient = client.GetBlobContainerClient("results");
-        await blobContainerClient.CreateIfNotExistsAsync();
-
-        var filename = $"{Environment.OSVersion}-{DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss")}.json";
-
-        var blobClient = blobContainerClient.GetBlobClient(filename);
-
-        using (MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString)))
-            await blobContainerClient.UploadBlobAsync(filename, memoryStream);
-
-
-        async Task StopTest(CancellationTokenSource cts)
+        try
         {
-            await Task.Run(async () =>
-            {
-                while (true)
-                {
-                    if (cts.Token.IsCancellationRequested)
-                    {
-                        breakTest = true;
-                        await Task.Delay(100);
-                        break;
-                    }
-                }
-            });
+            var client = new BlobServiceClient(Config.StorageConnectionString);
+            var blobContainerClient = client.GetBlobContainerClient("results");
+            await blobContainerClient.CreateIfNotExistsAsync();
+
+            var filename = $"{operatingSystem}-{platformVersion}-{DateTime.UtcNow.ToString("yyyy-MM-dd-hh-mm-ss")}.json";
+
+            using (MemoryStream memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonString)))
+                await blobContainerClient.UploadBlobAsync(filename, memoryStream);
+
+            Console.WriteLine("Uploaded.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 }
