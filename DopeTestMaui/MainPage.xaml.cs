@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Blobs;
+﻿using Azure;
+using Azure.Storage.Blobs;
 using Microsoft.Maui.Layouts;
 using Newtonsoft.Json;
 using Saplin.xOPS.UI.Misc;
@@ -50,7 +51,7 @@ public partial class MainPage : ContentPage
                 };
 
                 AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
-                AbsoluteLayout.SetLayoutBounds(label, new Rectangle(rand.NextDouble(), rand.NextDouble(), 80, 24));
+                AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
 
                 absolute.Dispatcher.Dispatch(() =>
                 {
@@ -140,7 +141,7 @@ public partial class MainPage : ContentPage
                 };
 
                 AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
-                AbsoluteLayout.SetLayoutBounds(label, new Rectangle(rand.NextDouble(), rand.NextDouble(), 80, 24));
+                AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
 
                 labels[k] = label;
             }
@@ -254,7 +255,7 @@ public partial class MainPage : ContentPage
                 };
 
                 AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
-                AbsoluteLayout.SetLayoutBounds(label, new Rectangle(rand.NextDouble(), rand.NextDouble(), 80, 24));
+                AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
 
                 if (processed > max)
                 {
@@ -422,7 +423,7 @@ public partial class MainPage : ContentPage
                 };
 
                 AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
-                AbsoluteLayout.SetLayoutBounds(label, new Rectangle(rand.NextDouble(), rand.NextDouble(), 80, 24));
+                AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
 
                 if (processed > max)
                 {
@@ -539,11 +540,13 @@ public partial class MainPage : ContentPage
         var results = new { OS = operatingSystem, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = resultGridST };
         string jsonString = JsonConvert.SerializeObject(results);
 
+        dopes.Text = $"Build: {results.Build}; Change: {results.Change}";
         Console.WriteLine(jsonString);
 
+#if !DEBUG
         try
         {
-            var client = new BlobServiceClient(Config.StorageConnectionString);
+                var client = new BlobServiceClient(new Uri(Config.StorageUrl), new AzureSasCredential(Config.StorageSasToken));
             var blobContainerClient = client.GetBlobContainerClient("results");
             await blobContainerClient.CreateIfNotExistsAsync();
 
@@ -558,6 +561,7 @@ public partial class MainPage : ContentPage
         {
             Console.WriteLine(ex);
         }
+#endif
     }
 }
 
