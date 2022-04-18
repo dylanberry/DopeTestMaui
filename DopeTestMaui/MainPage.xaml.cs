@@ -517,11 +517,11 @@ public partial class MainPage : ContentPage
         await Task.Delay(pauseLengthMs);
         _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultChangeST);
 
-        startGridST_Clicked(default, default);
-        await Task.Delay(testLengthMs);
-        Stop_Clicked(default, default);
-        await Task.Delay(pauseLengthMs);
-        _ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultGridST);
+        //startGridST_Clicked(default, default);
+        //await Task.Delay(testLengthMs);
+        //Stop_Clicked(default, default);
+        //await Task.Delay(pauseLengthMs);
+        //_ = Decimal.TryParse(dopes.Text.Replace(" Dopes/s (AVG)", "").Trim(), out var resultGridST);
 
         var platformVersion = "Maui 6.0.200-preview.12.2441";
 
@@ -537,7 +537,7 @@ public partial class MainPage : ContentPage
         var operatingSystem = "Unknown";
 #endif
 
-        var results = new { OS = operatingSystem, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = resultGridST };
+        var results = new { OS = operatingSystem, Platform = platformVersion, Build = resultST, Change = resultChangeST, Reuse = 0, Grid = 0 };
         string jsonString = JsonConvert.SerializeObject(results);
 
         dopes.Text = $"Build: {results.Build}; Change: {results.Change}";
@@ -546,7 +546,7 @@ public partial class MainPage : ContentPage
 #if !DEBUG
         try
         {
-                var client = new BlobServiceClient(new Uri(Config.StorageUrl), new AzureSasCredential(Config.StorageSasToken));
+            var client = new BlobServiceClient(new Uri(Config.StorageUrl), new AzureSasCredential(Config.StorageSasToken));
             var blobContainerClient = client.GetBlobContainerClient("results");
             await blobContainerClient.CreateIfNotExistsAsync();
 
