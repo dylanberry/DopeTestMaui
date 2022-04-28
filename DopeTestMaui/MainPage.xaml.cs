@@ -414,22 +414,24 @@ public partial class MainPage : ContentPage
             //60hz, 16ms to build the frame
             while (sw.ElapsedMilliseconds - now < 16)
             {
-
-                var label = new Label()
-                {
-                    Text = "Dope",
-                    TextColor = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
-                    Rotation = rand.NextDouble() * 360
-                };
-
-                AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
-                AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
-
                 if (processed > max)
                 {
                     (absolute.Children[processed % max] as Label).Text = texts[(int)Math.Floor(rand.NextDouble() * 4)];
                 }
-                else absolute.Children.Add(label);
+                else 
+                {
+                    var label = new Label()
+                    {
+                        Text = "Dope",
+                        TextColor = new Color((float)rand.NextDouble(), (float)rand.NextDouble(), (float)rand.NextDouble()),
+                        Rotation = rand.NextDouble() * 360
+                    };
+
+                    AbsoluteLayout.SetLayoutFlags(label, AbsoluteLayoutFlags.PositionProportional);
+                    AbsoluteLayout.SetLayoutBounds(label, new Rect(rand.NextDouble(), rand.NextDouble(), 80, 24));
+
+                    absolute.Children.Add(label);
+                }
 
                 processed++;
 
